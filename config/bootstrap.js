@@ -10,7 +10,7 @@ app.use(
 	ejwt({
 		secret: process.env.SECRET,
 		algorithms: ['HS256']
-	}).unless({ path: ['/auth', '/register', '/forgot'] })
+	}).unless({ path: ['/auth', '/user/new', '/forgot'] })
 );
 
 app.use(function (err, req, res, next) {
@@ -20,6 +20,6 @@ app.use(function (err, req, res, next) {
 });
 
 mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
 app.use(express.json());
-exports.default = app;
+
+module.exports = app;

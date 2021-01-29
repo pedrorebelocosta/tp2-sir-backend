@@ -9,9 +9,10 @@
 		"start": "node app.js"
 	},
 	"author": "Pedro Costa, Joao Neves",
-	"license": "GPL-3.0-or-later",
+	"license": "MIT",
 	"dependencies": {
 		"bcrypt": "^5.0.0",
+		"crypto-js": "^4.0.0",
 		"express": "^4.17.1",
 		"express-jwt": "^6.0.0",
 		"jsonwebtoken": "^8.5.1",
