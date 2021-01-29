@@ -1,34 +1,9 @@
+const hmacSHA256 = require('crypto-js/hmac-sha256');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 
 module.exports = {
-	create: function (req, res, next) {
-		const email = req.body.email;
-		const password = req.body.password;
-		
-		if (_.isNil(email) && _.isNil(password)) {
-			res.status(400).json({ message: "Username and password must be supplied!" })
-			return;
-		}
-
-		const newUser = new User(
-			{ email: req.body.email, password: req.body.password }
-		);
-
-		User.findOne({ email: newUser.email }, function (err, docs) {
-			if (err) next();
-			if (!(_.isNull(docs))) {
-				res.status(400).json({ message: "Email already exists!"})
-				return;
-			} else {
-				User.create(newUser, (err, doc) => {
-					if(err) next(err)
-					res.status(201).end();
-				});
-			}
-		});
-	},
 	authenticate: function (req, res, next) {
 		const email = req.body.email;
 		const password = req.body.password;
@@ -55,7 +30,12 @@ module.exports = {
 		});
 	},
 	forgot: function (req, res, next) {
-		// TODO implement forgot password function
+		/*
+			Expect to receive an email address
+			Send a password reset link (nodemailer) with a randomly generated PIN
+			Angular front-end: receives a link with a base64 encoded AES cipher, asks for PIN
+			decodes base64 AES, decrypts message with PIN, password reset should show up
+		*/
 		res.status(200).end();
 	}
 }

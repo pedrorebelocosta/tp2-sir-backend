@@ -6,5 +6,4 @@ mongoose.set('useCreateIndex', true);
 mongoose.connect(process.env.MONGODB_URI);
 
 mongoose.Promise = global.Promise;
-
 module.exports = mongoose;
