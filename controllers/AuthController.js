@@ -1,4 +1,3 @@
-const hmacSHA256 = require('crypto-js/hmac-sha256');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
@@ -20,7 +19,12 @@ module.exports = {
 				return;
 			} else {
 				if (bcrypt.compareSync(password, user.password)) {
-					const token = jwt.sign({ id: user._id }, process.env.SECRET, { expiresIn: '1h' });
+					const token = jwt.sign({ 
+											id: user.email,
+											firstname: user.firstname,
+											lastname: user.lastname 
+											},
+					process.env.SECRET, { expiresIn: '1h' });
 					res.status(200).send({ auth: true, token: token });
 				} else {
 					res.json({ status: "error", message: "Incorrect email/password" });
@@ -31,7 +35,7 @@ module.exports = {
 	},
 	forgot: function (req, res, next) {
 		/*
-			Expect to receive an email address
+			Expects to receive an email address
 			Send a password reset link (nodemailer) with a randomly generated PIN
 			Angular front-end: receives a link with a base64 encoded AES cipher, asks for PIN
 			decodes base64 AES, decrypts message with PIN, password reset should show up
