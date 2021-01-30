@@ -1,3 +1,4 @@
+const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 
@@ -5,8 +6,8 @@ module.exports = {
 	create: function (req, res, next) {
 		const email = req.body.email;
 		const password = req.body.password;
-		const firstname = req.body.firstName;
-		const lastname = req.body.lastName;
+		const firstname = req.body.firstname;
+		const lastname = req.body.lastname;
 
 		// if (_.isNil(email) && _.isNil(password)) {
 		//	res.status(400).json({ message: "Username and password must be supplied!" })
@@ -35,6 +36,7 @@ module.exports = {
 			When reading Profile Data, only send visible Personal info
 			email and password will be excluded.
 		*/
+		console.log(req.headers.authorization);
 		res.status(200).end();
 	},
 	update: function(req, res, next) {
