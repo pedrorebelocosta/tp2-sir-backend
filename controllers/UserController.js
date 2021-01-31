@@ -2,6 +2,8 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 
+const EXCLUDE_FIELDS = { email: 0, password: 0 };
+
 module.exports = {
 	create: function (req, res, next) {
 		const email = req.body.email;
@@ -10,8 +12,8 @@ module.exports = {
 		const lastname = req.body.lastname;
 
 		// if (_.isNil(email) && _.isNil(password)) {
-		//	res.status(400).json({ message: "Username and password must be supplied!" })
-		//	return;
+		// 	res.status(400).json({ message: "Username and password must be supplied!" })
+		// 	return;
 		// }
 
 		const newUser = new User(
@@ -36,23 +38,60 @@ module.exports = {
 			When reading Profile Data, only send visible Personal info
 			email and password will be excluded.
 		*/
-		console.log(req.headers.authorization);
-		res.status(200).end();
+		const requestedMe = req.originalUrl === '/user/me' ? true : false;
+		const authHeader = req.headers.authorization;
+		const decodedToken = jwt.decode(authHeader.split(' ')[1]);
+
+		if (requestedMe) {
+			User.findOne({ _id: decodedToken.id }, EXCLUDE_FIELDS,
+				(err, docs) => {
+					if (err) return next();
+					if (docs) res.status(200).json(docs);
+				}
+			);
+		} else {
+			const requestedUserID = req.params.id;
+			if (!requestedUserID) return;
+			User.findOne({ _id: requestedUserID }, EXCLUDE_FIELDS,
+				(err, docs) => {
+					if (err) return next();
+					if (docs) res.status(200).json(docs);
+				}
+			);
+		}
 	},
-	update: function(req, res, next) {
+	update: async function(req, res, next) {
 		/* 
-			Business Rule:
-			This action should verify if the user to delete
+			This method updates the current user
+			Will not return the email and password
 			matches the ID on the JWT
 		*/
-		res.status(200).end();
+		const authHeader = req.headers.authorization;
+		const decodedToken = jwt.decode(authHeader.split(' ')[1]);
+		if (!req.body) return res.status(400).end();
+		
+		const updatedUser = await User.findOneAndUpdate(
+			{ _id: decodedToken.id }, req.body,
+			{ new: true, fields: EXCLUDE_FIELDS
+		});
+
+		if (!updatedUser) return res.status(500).end();
+		res.status(200).json(updatedUser);
 	},
 	delete: function(req, res, next) {
 		/* 
-			Business Rule:
-			This action should verify if the user to delete
-			matches the ID on the JWT
+			This method deletes the current user
+			Returns 202 Accepted if user is successfully deleted
 		*/
-		res.status(200).end();
+		const authHeader = req.headers.authorization;
+		const decodedToken = jwt.decode(authHeader.split(' ')[1]);
+
+		User.findOneAndRemove(
+			{ _id: decodedToken.id }, EXCLUDE_FIELDS,
+			(err, docs) => { 
+				if (err) return next();
+				return res.status(202).json(docs);
+			}
+		);
 	}
 }
