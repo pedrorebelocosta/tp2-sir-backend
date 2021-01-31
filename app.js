@@ -1,14 +1,16 @@
-const app = require('./config/bootstrap').default;
+const app = require('./config/bootstrap');
 
 const AuthController = require('./controllers/AuthController');
 const UserController = require('./controllers/UserController');
-const PostController = require('./controllers/PostController');
 
-// Authentication and Authorization
+/*
+	/auth authorizes the user and returns a JWT
+	with a payload of the user if successfully authenticated
+	/forgot not implemented yet (needs security verifications)
+*/
 app.post('/auth', AuthController.authenticate);
 app.post('/forgot', AuthController.forgot);
 
-// User CRUD
 /*
 	To register a new user
 	Request Body: email, password, firstname and lastname
@@ -41,6 +43,7 @@ app.put('/user/me', UserController.update);
 
 /*
 	Delete the current user's profile
+	Returns 202 if user was successfuly deleted
 */
 app.delete('/user/me', UserController.delete);
 
