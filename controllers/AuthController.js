@@ -28,7 +28,7 @@ module.exports = {
 					}, process.env.SECRET, { expiresIn: '1h' });
 					res.status(200).send({ auth: true, token: token });
 				} else {
-					res.json({ status: "error", message: "Incorrect email/password" });
+					res.status(400).json({ status: "error", message: "Incorrect email/password" });
 					return;
 				}
 			}

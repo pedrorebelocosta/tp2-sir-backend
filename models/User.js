@@ -24,6 +24,12 @@ const User = new mongoose.Schema({
 		trim: true,
 		required: true
 	},
+	picture: {
+		type: String,
+		trim: true,
+		required: false,
+		default: ""
+	},
 	posts: {
 		type: Array,
 		default: [],
