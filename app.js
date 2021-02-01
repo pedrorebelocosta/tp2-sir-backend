@@ -21,18 +21,22 @@ app.post('/forgot', AuthController.forgot);
 app.post('/user/new', UserController.create);
 
 /*
-	Use case: get all data of currently logged in user (except password)
-	Without their email and password
-*/
-app.get('/user/me', UserController.read);
-
-/*
 	To retrieve the publicly visible data of a user
 	Endpoint requires ID (eg: /user/1239123912)
 	Returns firstname, lastname, posts (array of ids) 
 	and likedPosts (array of ids)
 */
 app.get('/user/:id', UserController.read);
+app.get('/user/:id/posts', UserController.readPosts);
+app.get('/user/:id/likes', UserController.readLikes);
+
+/*
+	Use case: get all data of currently logged in user (except password)
+	Without their email and password
+*/
+app.get('/user/me', UserController.read);
+app.get('/user/me/posts', UserController.readPosts);
+app.get('/user/me/likes', UserController.readLikes);
 
 /*
 	To update a user's data
@@ -50,10 +54,15 @@ app.delete('/user/me', UserController.delete);
 
 // Post CRUD
 app.post('/post', PostController.create);
+app.post('/post/:id/likes', PostController.createLike);
+
 app.get('/post', PostController.read);
 app.get('/post/:id', PostController.read);
+app.get('/post/:id/likes', PostController.readLikes);
+
 app.put('/post/:id', PostController.update);
 app.delete('/post/:id', PostController.delete);
+app.delete('/post/:id/likes', PostController.deleteLikes);
 
 app.listen(4000, () => {
 	console.log('API has started');

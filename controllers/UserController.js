@@ -1,4 +1,6 @@
+const ObjectId = require('mongoose').Types.ObjectId;
 const User = require('../models/User');
+const Post = require('../models/Post');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 
@@ -58,6 +60,47 @@ module.exports = {
 					if (docs) res.status(200).json(docs);
 				}
 			);
+		}
+	},
+	readPosts: async function (req, res, next) {
+		const requestedMe = req.originalUrl === '/user/me/posts' ? true : false;
+		const authHeader = req.headers.authorization;
+		const decodedToken = jwt.decode(authHeader.split(' ')[1]);
+
+		if (requestedMe) {
+			Post.find({ author: decodedToken._id }, (err, docs) => {
+				if (err) next(err);
+				res.status(200).json(docs);
+				return;
+			});
+		} else {
+			const requestedUserID = req.params.id;
+			Post.find({ author: requestedUserID }, (err, docs) => {
+				if (err) next(err);
+				res.status(200).json(docs);
+				return;
+			});
+		}
+	},
+	readLikes: async function(req, res, next) {
+		const requestedMe = req.originalUrl === '/user/me/likes' ? true : false;
+		const authHeader = req.headers.authorization;
+		const decodedToken = jwt.decode(authHeader.split(' ')[1]);
+
+		if (requestedMe) {
+			Post.find({ likes: new ObjectId(decodedToken._id) }, (err, docs) => {
+				if (err) next(err);
+				console.log(docs);
+				res.status(200).json(docs);
+				return;
+			});
+		} else {
+			const requestedUserID = req.params.id;
+			Post.find({ likes: requestedUserID }, (err, docs) => {
+				if (err) next(err);
+				res.status(200).json(docs);
+				return;
+			});
 		}
 	},
 	update: async function(req, res, next) {

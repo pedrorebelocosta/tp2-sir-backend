@@ -1,6 +1,9 @@
+const ObjectId = require('mongoose').Types.ObjectId;
 const User = require('../models/User');
 const Post = require('../models/Post');
 const jwt = require('jsonwebtoken');
+
+const EXCLUDE_FIELDS = { email: 0, password: 0 };
 
 module.exports = {
 	create: function (req, res, next) {
@@ -20,6 +23,23 @@ module.exports = {
 			res.status(201).json(doc);
 		});
 	},
+	createLike: async function(req, res, next) {
+		const authHeader = req.headers.authorization;
+		const decodedToken = jwt.decode(authHeader.split(' ')[1]);
+		const postId = req.params.id;
+
+		Post.find({ _id: postId, likes: new ObjectId(decodedToken._id) }, (err, docs) => {
+			if (err) return next(err);
+			if (docs) return res.status(302).end();
+		});
+
+		const liked = await Post.findOneAndUpdate(
+			{ _id: postId },
+			{ $push: { likes: new ObjectId(decodedToken._id) }}
+		);
+
+		if (liked) res.status(200).end();
+	},
 	read: function (req, res, next) {
 		const postId = req.params.id;
 		if (postId) {
@@ -34,6 +54,21 @@ module.exports = {
 			});
 		}
 	},
+	readLikes: async function (req, res, next) {
+		// get all the user ids, save them
+		const postId = req.params.id;
+		const post = await Post.findOne({ _id: postId });
+		const usersThatLiked = post.likes.map((elem) => new ObjectId(elem));
+
+		User.find(
+			{ _id: { $in: usersThatLiked }},
+			EXCLUDE_FIELDS,
+			(err, docs) => { 
+				if (err) return next(err);
+				else return res.status(200).json(docs);
+			}
+		);
+	},
 	update: async function (req, res, next) {
 		const authHeader = req.headers.authorization;
 		const decodedToken = jwt.decode(authHeader.split(' ')[1]);
@@ -41,11 +76,10 @@ module.exports = {
 		const post = await Post.findOne({ _id: postId });
 
 		// Post doesn't exist?
-		if (!post) next();
+		if (!post) return next();
 		// Requestor is not post author?
 		if (!(post.author == decodedToken._id)) {
-			res.status(403).end();
-			return;
+			return res.status(403).end();
 		}
 
 		const updatedPost = await Post.findOneAndUpdate(
@@ -54,7 +88,7 @@ module.exports = {
 		);
 
 		if (!updatedPost) return res.status(500).end();
-		res.status(200).json(updatedPost);
+		return res.status(200).json(updatedPost);
 	},
 	delete: async function (req, res, next) {
 		const authHeader = req.headers.authorization;
@@ -63,11 +97,10 @@ module.exports = {
 		const post = await Post.findOne({ _id: postId });
 		
 		// Post doesn't exist?
-		if (!post) next();
+		if (!post) return next();
 		// Requestor is not post author?
 		if (!(post.author == decodedToken._id)) {
-			res.status(403).end();
-			return;
+			return res.status(403).end();
 		}
 
 		Post.findOneAndRemove({ _id: postId }, async (err, doc) => {
@@ -76,7 +109,20 @@ module.exports = {
 				{ _id: doc.author },
 				{ $pull: { posts: doc._id } }
 			);
-			res.status(202).json(doc);
+			return res.status(202).json(doc);
 		});
+	},
+	deleteLikes: async function (req, res, next) {
+		const authHeader = req.headers.authorization;
+		const decodedToken = jwt.decode(authHeader.split(' ')[1]);
+		const postId = req.params.id;
+
+		const disliked = await Post.findOneAndUpdate(
+			{ _id: postId },
+			{ $pull: { likes: new ObjectId(decodedToken._id) }}
+		);
+
+		if (disliked) return res.status(200).end();
+		else return res.status(400).end();
 	}
 }
