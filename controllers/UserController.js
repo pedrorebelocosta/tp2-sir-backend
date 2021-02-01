@@ -20,14 +20,14 @@ module.exports = {
 			{ email, firstname, lastname, password }
 		);
 
-		User.findOne({ email }, function (err, docs) {
+		User.findOne({ email }, (err, docs) => {
 			if (err) next();
 			if (!(_.isNull(docs))) {
 				res.status(400).json({ message: "Email already exists!"})
 				return;
 			} else {
 				User.create(newUser, (err, doc) => {
-					if(err) next(err)
+					if(err) next(err);
 					res.status(201).end();
 				});
 			}
@@ -43,7 +43,7 @@ module.exports = {
 		const decodedToken = jwt.decode(authHeader.split(' ')[1]);
 
 		if (requestedMe) {
-			User.findOne({ _id: decodedToken.id }, EXCLUDE_FIELDS,
+			User.findOne({ _id: decodedToken._id }, EXCLUDE_FIELDS,
 				(err, docs) => {
 					if (err) return next();
 					if (docs) res.status(200).json(docs);
@@ -71,7 +71,7 @@ module.exports = {
 		if (!req.body) return res.status(400).end();
 		
 		const updatedUser = await User.findOneAndUpdate(
-			{ _id: decodedToken.id }, req.body,
+			{ _id: decodedToken._id }, req.body,
 			{ new: true, fields: EXCLUDE_FIELDS
 		});
 
@@ -87,9 +87,9 @@ module.exports = {
 		const decodedToken = jwt.decode(authHeader.split(' ')[1]);
 
 		User.findOneAndRemove(
-			{ _id: decodedToken.id }, EXCLUDE_FIELDS,
+			{ _id: decodedToken._id }, EXCLUDE_FIELDS,
 			(err, docs) => { 
-				if (err) return next();
+				if (err) return next(err);
 				return res.status(202).json(docs);
 			}
 		);

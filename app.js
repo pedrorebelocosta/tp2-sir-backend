@@ -2,6 +2,7 @@ const app = require('./config/bootstrap');
 
 const AuthController = require('./controllers/AuthController');
 const UserController = require('./controllers/UserController');
+const PostController = require('./controllers/PostController');
 
 /*
 	/auth authorizes the user and returns a JWT
@@ -48,11 +49,11 @@ app.put('/user/me', UserController.update);
 app.delete('/user/me', UserController.delete);
 
 // Post CRUD
-// app.post('/post', PostController.create);
-// app.get('/post', PostController.read);
-// app.get('/post/:id', PostController.read);
-// app.put('/post/:id', PostController.update);
-// app.delete('/post/:id', PostController.delete);
+app.post('/post', PostController.create);
+app.get('/post', PostController.read);
+app.get('/post/:id', PostController.read);
+app.put('/post/:id', PostController.update);
+app.delete('/post/:id', PostController.delete);
 
 app.listen(4000, () => {
 	console.log('API has started');
