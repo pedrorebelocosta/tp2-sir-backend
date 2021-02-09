@@ -38,6 +38,7 @@ app.get('/user/me', UserController.read);
 app.get('/user/me/posts', UserController.readPosts);
 app.get('/user/me/likes', UserController.readLikes);
 
+
 /*
 	To update a user's data
 	Request body: can be everything except different ID

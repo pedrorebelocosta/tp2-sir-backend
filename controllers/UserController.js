@@ -133,6 +133,9 @@ module.exports = {
 			{ _id: decodedToken._id }, EXCLUDE_FIELDS,
 			(err, docs) => { 
 				if (err) return next(err);
+				Post.deleteMany({ author: decodedToken._id }, (err, docs) => {
+					if (err) return next(err);
+				});
 				return res.status(202).json(docs);
 			}
 		);

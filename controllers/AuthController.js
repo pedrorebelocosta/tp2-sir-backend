@@ -38,7 +38,7 @@ module.exports = {
 		/*
 			Expects to receive an email address
 			Send a password reset link (nodemailer) with a randomly generated PIN
-			Angular front-end: receives a link with a base64 encoded AES cipher, asks for PIN
+			Angular front-end: receives a link with a base64 encoded AES cipher,
 			decodes base64 AES, decrypts message with PIN, password reset should show up
 		*/
 		res.status(200).end();

@@ -28,17 +28,21 @@ module.exports = {
 		const decodedToken = jwt.decode(authHeader.split(' ')[1]);
 		const postId = req.params.id;
 
-		Post.find({ _id: postId, likes: new ObjectId(decodedToken._id) }, (err, docs) => {
-			if (err) return next(err);
-			if (docs) return res.status(302).end();
-		});
+		const foundLike = await Post.findOne({ _id: postId, likes: new ObjectId(decodedToken._id) });
+
+		if (foundLike) {
+			res.status(302).end();
+			return;
+		}
 
 		const liked = await Post.findOneAndUpdate(
 			{ _id: postId },
-			{ $push: { likes: new ObjectId(decodedToken._id) }}
+			{ $push: { likes: new ObjectId(decodedToken._id) }},
+			{ new: true }
 		);
 
-		if (liked) res.status(200).end();
+		if (liked) return res.status(200).json(liked);
+		else return res.status(400).end();
 	},
 	read: function (req, res, next) {
 		const postId = req.params.id;
@@ -119,10 +123,13 @@ module.exports = {
 
 		const disliked = await Post.findOneAndUpdate(
 			{ _id: postId },
-			{ $pull: { likes: new ObjectId(decodedToken._id) }}
+			{ $pull: { likes: new ObjectId(decodedToken._id) }},
+			{ new: true }
 		);
 
-		if (disliked) return res.status(200).end();
+		if (disliked) {
+			return res.status(200).json(disliked);
+		}
 		else return res.status(400).end();
 	}
 }
