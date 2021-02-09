@@ -7,14 +7,13 @@ const mongoose = require('./database');
 const cors = require('cors');
 
 const app = express();
-
-app.use(
+app.use(express.static('files')).use(
 	ejwt({
 		secret: process.env.SECRET,
 		algorithms: ['HS256']
-	}).unless({ path: ['/auth', '/user/new', '/forgot'] })
-);
-
+	})
+	.unless({ path: ['/auth', '/user/new', '/forgot'] }));
+	
 app.use(fileUpload());
 app.use(express.static('files'));
 
