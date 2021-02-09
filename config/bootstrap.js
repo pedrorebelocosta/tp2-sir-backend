@@ -1,6 +1,7 @@
 require('dotenv').config({ path: `${__dirname}/.env`});;
 
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const ejwt = require('express-jwt');
 const mongoose = require('./database');
 const cors = require('cors');
@@ -13,6 +14,8 @@ app.use(
 		algorithms: ['HS256']
 	}).unless({ path: ['/auth', '/user/new', '/forgot'] })
 );
+
+app.use(fileUpload());
 
 app.use(function (err, req, res, next) {
 	if (err.name === 'UnauthorizedError') {
