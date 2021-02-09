@@ -19,15 +19,15 @@ app.post('/upload', function (req, res, next) {
 	}
 
 	// The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-	sampleFile = req.files.sampleFile;
-	uploadPath = __dirname + '/files/' + sampleFile.name;
+	sampleFile = req.files.fileKey;
+	filename = Date.now() + sampleFile.name;
+	uploadPath = __dirname + '/files/' + filename;
 
 	// Use the mv() method to place the file somewhere on your server
 	sampleFile.mv(uploadPath, function (err) {
 		if (err)
 			return res.status(500).send(err);
-
-		res.send('File uploaded!');
+		res.status(201).json({ url: `http://localhost:4000/${filename}`}); 
 	});
 });
 

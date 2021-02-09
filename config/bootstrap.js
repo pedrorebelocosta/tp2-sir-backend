@@ -16,6 +16,7 @@ app.use(
 );
 
 app.use(fileUpload());
+app.use(express.static('files'));
 
 app.use(function (err, req, res, next) {
 	if (err.name === 'UnauthorizedError') {
