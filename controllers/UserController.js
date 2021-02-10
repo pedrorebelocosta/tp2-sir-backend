@@ -12,6 +12,7 @@ module.exports = {
 		const password = req.body.password;
 		const firstname = req.body.firstname;
 		const lastname = req.body.lastname;
+		const picture = req.body.photoUrl;
 
 		// if (_.isNil(email) && _.isNil(password)) {
 		// 	res.status(400).json({ message: "Username and password must be supplied!" })
@@ -19,7 +20,7 @@ module.exports = {
 		// }
 
 		const newUser = new User(
-			{ email, firstname, lastname, password }
+			{ email, firstname, lastname, password, picture }
 		);
 
 		User.findOne({ email }, (err, docs) => {
