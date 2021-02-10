@@ -12,7 +12,7 @@ app.use(express.static('files')).use(
 		secret: process.env.SECRET,
 		algorithms: ['HS256']
 	})
-	.unless({ path: ['/auth', '/user/new', '/forgot'] }));
+	.unless({ path: ['/auth', '/user/new', '/forgot', '/upload'] }));
 	
 app.use(fileUpload());
 app.use(express.static('files'));
